@@ -5,6 +5,8 @@ import ContactForm from './ContactForm/ContactForm';
 import ContactList from './ContactList/ContactList';
 import Filter from './Filter/Filter';
 
+const LS_KEY = 'reader_contacts';
+
 class App extends Component {
   state = {
     contacts: [
@@ -16,6 +18,21 @@ class App extends Component {
     filter: '',
   };
 
+  componentDidMount() {
+    const record = JSON.parse(localStorage.getItem(LS_KEY));
+
+    if (record) {
+      this.setState({ contacts: record });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.ContactList !== this.state.contacts) {
+      localStorage.setItem(LS_KEY, JSON.stringify(this.state.contacts));
+      console.log('update');
+    }
+  }
+
   handleFilterChange = event => {
     this.setState({ filter: event.target.value });
   };
@@ -23,7 +40,6 @@ class App extends Component {
   addContact = (name, number) => {
     const { contacts } = this.state;
     const nameExists = contacts.find(contact => contact.name === name);
-    console.log(contacts);
     if (nameExists) {
       alert(`${name} is already in contacts`);
       this.setState({ name: '', number: '' });
@@ -37,7 +53,6 @@ class App extends Component {
     this.setState(prevState => ({
       contacts: [...prevState.contacts, newContact],
     }));
-    console.log('39', newContact);
   };
 
   handleDeleteContact = contactId => {
